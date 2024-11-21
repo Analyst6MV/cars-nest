@@ -1,36 +1,57 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { CarsService } from './cars.service';
+import {
+  IRespons,
+  successRespons,
+} from 'src/Interfaces/responController.interface';
+import { ICar } from './interfaces/car.interface';
 
-interface IRespons {
-  success: boolean;
-  message: string;
-  data: any;
-}
-
+// este decorador se usa para definir la ruta que activara este controlador
+// ejemplo en este caso seria: http://localhost:3000/api/cars/
 @Controller('api/cars')
 export class CarsController {
-  private readonly cars: string[] = ['Toyota', 'BMW', 'KIA'];
-  private responsSuccess: IRespons = {
-    success: true,
-    message: 'ok',
-    data: {},
-  };
-  private responsError: IRespons = {
-    success: false,
-    message: 'Element Not Found',
-    data: {},
-  };
+  private readonly carsService: CarsService;
 
+  constructor(carsService: CarsService) {
+    this.carsService = carsService;
+  }
+
+  // con estos decoreadors se define el tipo de metodo que se espera para ejecutar el motodo interno del controlador
   @Get()
   GetAllCars(): IRespons {
-    this.responsSuccess.data = this.cars;
-    return this.responsSuccess;
+    successRespons.data = this.carsService.FindAll();
+    return successRespons;
   }
+
+  // con estos decoreadors se define el tipo de metodo que se espera para ejecutar el motodo interno del controlador
   @Get(':id')
-  GetCarById(@Param('id') id: string): IRespons {
-    if (this.cars[id] === undefined) {
-      return this.responsError;
-    }
-    this.responsSuccess.data = this.cars[+id];
-    return this.responsSuccess;
+  GetCarById(@Param('id', ParseUUIDPipe) id: string): IRespons {
+    const dataResult = this.carsService.FindById(id);
+    successRespons.data = dataResult;
+    return successRespons;
+  }
+
+  @Post('/register-car')
+  registerCar(@Body() newCar: ICar) {
+    return (successRespons.data = { newCar });
+  }
+
+  @Patch('/update-car/:id')
+  updateCar(@Param('id', ParseUUIDPipe) id: number, @Body() updatedCar: ICar) {
+    return (successRespons.data = { id, updatedCar });
+  }
+
+  @Delete('/delete-car/:id')
+  deleteCar(@Param('id', ParseUUIDPipe) id: number) {
+    return (successRespons.data = { id });
   }
 }
