@@ -41,7 +41,7 @@ http://localhost:3000/seed
 ```
 
 ## Remplace .env.Templaate
-You must replace the file name from .env.template to .env.development and complete the following variables:
+You must replace the file name from .env.template to .env.development.local and complete the following variables:
 ```
 PORT = // Port expost API Resrt
 ```
